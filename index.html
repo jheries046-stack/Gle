@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GleeJeYly - Jelly Cheesecake</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="GleeJeYly - Premium Jelly Cheesecake with Crushed Graham Base">
+    <meta name="keywords" content="cheesecake, jelly cheesecake, dessert, homemade, artisanal">
+    <meta name="author" content="GleeJeYly">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍰</text></svg>">
+    
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles/style.css">
+    
+    <!-- Critical CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #4A3728;
+            background-color: #FBF8F5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo" aria-label="GleeJeYly Home">
+                <img src="images/logo.svg" alt="GleeJeYly Logo" class="logo-image">
+            </a>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-expanded="false" aria-controls="navMenu">
+                <span class="sr-only">Menu</span>
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav aria-label="Main Navigation">
+                <ul id="navMenu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#product">Product</a></li>
+                    <li><a href="#order" class="btn">Order Now</a></li>
+                    <li><a href="#reviews">Reviews</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <h1>GleeJeYly Jelly Cheesecake</h1>
+            <p class="tagline">✨ Handcrafted with Love ✨</p>
+            <p class="description">Creamy, jelly cheesecake with a delicious crushed graham base. Perfect for any celebration.</p>
+            <a href="#order" class="btn btn-large">Order Now</a>
+        </div>
+    </section>
+
+    <!-- Product Section -->
+    <section class="product" id="product">
+        <div class="container">
+            <h2>Our Signature Cheesecake</h2>
+            
+            <div class="product-grid">
+                <div class="product-visual">
+                    <div class="product-image">
+                        <img src="images/cheesecake1.jpg" alt="GleeJeYly Jelly Cheesecake" class="cheesecake-img">
+                    </div>
+                </div>
+                
+                <div class="product-info">
+                    <h3>GleeJeYly Jelly Cheesecake</h3>
+                    
+                    <div class="product-descriptions">
+                        <h4>Product Description:</h4>
+                        <div class="product-description">
+                            <span class="product-description-name">Bottom Layer:</span>
+                            <span class="product-description-desc">Crushed Graham Cracker Base</span>
+                        </div>
+                        <div class="product-description">
+                            <span class="product-description-name">Top Layer:</span>
+                            <span class="product-description-desc">Creamy Jelly</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pricing">
+                        <div class="price-item">
+                            <h5>₱25.00</h5>
+                            <p>Jelly Cheesecake</p>
+                            <small>Perfect for 1 person</small>
+                        </div>
+                    </div>
+                    
+                    <p class="highlight">✨ Made fresh to order ✨</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Section -->
+    <section class="order" id="order">
+        <div class="container">
+            <h2>Order Form</h2>
+            
+            <div class="order-form-section">
+                <form id="orderForm" novalidate>
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Juan Dela Cruz" required>
+                        <span class="error-msg"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number *</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="09123456789" required>
+                        <span class="error-msg"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="facebook">Facebook Account *</label>
+                        <input type="text" id="facebook" name="facebook" placeholder="Your Facebook Name/URL" required>
+                        <span class="error-msg"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pickupDate">Pickup/Delivery Date *</label>
+                        <input type="date" id="pickupDate" name="pickupDate" required>
+                        <span class="error-msg"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity">Quantity *</label>
+                            <div class="quantity-selector">
+                            <button type="button" id="qtyMinus" class="qty-btn">−</button>
+                            <span id="quantity" name="quantity" class="qty-display">1</span>
+                            <button type="button" id="qtyPlus" class="qty-btn">+</button>
+                        </div>
+                        <input type="hidden" id="quantityValue" name="quantity" value="1">
+                        <span class="error-msg"></span>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h4>Order Summary</h4>
+                        <div class="summary-row">
+                            <span>Unit Price:</span>
+                            <span id="summaryUnitPrice">₱25.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Quantity:</span>
+                            <span id="summaryQty">1</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="summaryTotal">₱25.00</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-submit" id="submitBtn" disabled>Place Order</button>
+                    <p class="form-note">We'll contact you within 24 hours to confirm your order.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews & Ratings Section -->
+    <section class="reviews" id="reviews">
+        <div class="container">
+            <h2>Customer Reviews & Ratings</h2>
+            
+            <div class="reviews-container">
+                <!-- Review Form -->
+                <div class="review-form-section">
+                    <h3>Share Your Experience</h3>
+                    <form id="reviewForm" novalidate>
+                        <div class="form-group">
+                            <label for="reviewName">Your Name *</label>
+                            <input type="text" id="reviewName" name="reviewName" placeholder="Your name" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reviewEmail">Email *</label>
+                            <input type="email" id="reviewEmail" name="reviewEmail" placeholder="your@email.com" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Rate the Product *</label>
+                            <div class="star-rating" id="productRating">
+                                <i class="fas fa-star" data-value="1"></i>
+                                <i class="fas fa-star" data-value="2"></i>
+                                <i class="fas fa-star" data-value="3"></i>
+                                <i class="fas fa-star" data-value="4"></i>
+                                <i class="fas fa-star" data-value="5"></i>
+                            </div>
+                            <input type="hidden" id="productRatingValue" name="productRating" value="0">
+                            <span class="error-msg"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Rate Our Service *</label>
+                            <div class="star-rating" id="serviceRating">
+                                <i class="fas fa-star" data-value="1"></i>
+                                <i class="fas fa-star" data-value="2"></i>
+                                <i class="fas fa-star" data-value="3"></i>
+                                <i class="fas fa-star" data-value="4"></i>
+                                <i class="fas fa-star" data-value="5"></i>
+                            </div>
+                            <input type="hidden" id="serviceRatingValue" name="serviceRating" value="0">
+                            <span class="error-msg"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reviewComment">Your Comment *</label>
+                            <textarea id="reviewComment" name="reviewComment" placeholder="Share your thoughts about our cheesecake and service..." rows="5" required></textarea>
+                            <span class="error-msg"></span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-submit">Submit Review</button>
+                    </form>
+                </div>
+                
+                <!-- Reviews Display -->
+                <div class="reviews-display-section">
+                    <h3>Customer Reviews</h3>
+                    <div id="reviewsList" class="reviews-list">
+                        <!-- Reviews will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How far in advance should I order?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>We recommend ordering at least 3-5 days in advance to ensure we have enough time to prepare your cheesecake with the finest quality ingredients. This allows us to craft your order with care and attention to detail.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Do you offer delivery?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, we offer delivery within Biliran. However, we recommend pickup to ensure your cheesecake arrives in perfect condition. Please specify your preference during the order process.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How should I store the cheesecake?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Keep your cheesecake refrigerated at all times. It stays fresh for 3-4 days in the fridge. For longer storage, you can freeze it for up to 1 month. Thaw in the refrigerator before serving for best taste and texture.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get in Touch Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-header">
+                <h2>Get in Touch</h2>
+                <p class="contact-subtitle">We'd love to hear from you. Reach out to us through any of these channels.</p>
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h4>Call or Text</h4>
+                        <p><a href="tel:09123456789">09123456789</a></p>
+                        <p class="contact-note">Available during business hours</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h4>Facebook Messenger</h4>
+                        <p><a href="https://www.facebook.com/gleejeyly" target="_blank" rel="noopener noreferrer">@gleejeyly</a></p>
+                        <p class="contact-note">Quick responses on Messenger</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h4>Order Hours</h4>
+                        <p>Monday - Friday</p>
+                        <p>8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 GleeJeYly. All rights reserved. | Crafting happiness, one cheesecake at a time.</p>
+        </div>
+    </footer>
+
+    <!-- Success Notification Modal -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Order Submitted!</h3>
+            <p>Thank you for your order! We'll contact you within 24 hours to confirm.</p>
+            <div class="modal-contact">
+                <p><strong>Next Steps:</strong></p>
+                <p>We'll reach out via your Facebook account or phone number to finalize the details.</p>
+            </div>
+            <button id="closeModalBtn" class="btn btn-modal">Got It!</button>
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="scripts/script.js"></script>
+
+    <!-- Elfsight Facebook Chat | Untitled Facebook Chat -->
+    <script src="https://elfsightcdn.com/platform.js" async></script>
+    <div class="elfsight-app-c4435d3f-c8c1-4a2d-899b-c31b2b109dc4" data-elfsight-app-lazy></div>
+</body>
+</html>
