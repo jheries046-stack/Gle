@@ -1004,8 +1004,7 @@ nav ul li a:hover::after {
     transform: translateY(-2px);
 }
 
-.flavor-option input[type="radio"]:checked + .flavor-label::after,
-.flavor-option input[type="checkbox"]:checked + .flavor-label::after {
+.flavor-option input[type="radio"]:checked + .flavor-label::after {
     content: '✓';
     position: absolute;
     top: 10px;
