@@ -1057,7 +1057,7 @@ nav ul li a:hover::after {
 /* ===== FLAVOR OPTIONS ===== */
 .flavor-options {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: 1fr;
     gap: 15px;
     margin-bottom: 15px;
 }
@@ -1081,6 +1081,7 @@ nav ul li a:hover::after {
     background: #fafafa;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
+    position: relative;
 }
 
 .flavor-label i {
@@ -1119,6 +1120,78 @@ nav ul li a:hover::after {
 }
 
 .flavor-option:hover .flavor-label {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(232, 112, 79, 0.1);
+}
+
+/* ===== TOPPING OPTIONS ===== */
+.toppings-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.topping-radio {
+    display: block;
+    cursor: pointer;
+}
+
+.topping-radio input[type="radio"] {
+    display: none;
+}
+
+.topping-label {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fafafa;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    position: relative;
+}
+
+.topping-label i {
+    font-size: 1.3rem;
+    color: var(--primary);
+    min-width: 25px;
+}
+
+.topping-label strong {
+    color: var(--dark);
+    font-size: 0.98rem;
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.topping-label small {
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.topping-radio input[type="radio"]:checked + .topping-label {
+    background: linear-gradient(135deg, var(--accent) 0%, rgba(244, 212, 200, 0.4) 100%);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(232, 112, 79, 0.2), inset 0 0 0 1px rgba(232, 112, 79, 0.3);
+    transform: translateY(-2px);
+}
+
+.topping-radio input[type="radio"]:checked + .topping-label::after {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.topping-radio:hover .topping-label {
     border-color: var(--primary);
     box-shadow: 0 4px 12px rgba(232, 112, 79, 0.1);
 }
