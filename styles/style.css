@@ -1796,7 +1796,7 @@ footer p {
     }
     
     .product-image {
-        width: 260px;
+        width: 335px;
         height: 260px;
         font-size: 4.2rem;
         border-radius: 20px;
@@ -1942,7 +1942,7 @@ footer p {
     
     .order-form-section {
         max-width: 100%;
-        padding: 0;
+        padding: 20px;
     }
     
     .form-group {
