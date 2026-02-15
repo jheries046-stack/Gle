@@ -1,14 +1,15 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, redirect, url_for, session
 from flask_cors import CORS
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from functools import wraps
 import time
 import re
+from werkzeug.security import check_password_hash, generate_password_hash
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.', static_folder='.')
 
 # Security: Configure CORS with restricted origins
 allowed_origins = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
@@ -19,6 +20,17 @@ app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1MB
 
 # Security: Disable server header
 app.config['ENV_PROD'] = True
+
+# Security: Session configuration
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gleejeyly-secret-key-change-in-production')
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+
+# Admin credentials (use environment variables in production)
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -49,6 +61,16 @@ def rate_limit(f):
         request_counts[ip].append(now)
         return f(*args, **kwargs)
     
+    return decorated_function
+
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin_id' not in session:
+            logger.warning(f"Unauthorized access attempt: {request.remote_addr}")
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+        return f(*args, **kwargs)
     return decorated_function
 
 # Input validation helper
@@ -245,6 +267,58 @@ def create_review():
         logger.error(f"Error creating review: {str(e)}")
         return jsonify({'success': False, 'error': 'Failed to process review'}), 400
 
+# ===== AUTHENTICATION ROUTES =====
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Admin login page and handler"""
+    if request.method == 'GET':
+        return render_template('login.html')
+    
+    # Handle POST request (form submission)
+    try:
+        data = request.get_json() if request.is_json else request.form.to_dict()
+        username = data.get('username', '').strip()
+        password = data.get('password', '').strip()
+        
+        if not username or not password:
+            logger.warning(f"Login attempt with empty credentials from {request.remote_addr}")
+            return jsonify({'success': False, 'error': 'Username and password required'}), 400
+        
+        # Validate credentials
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['admin_id'] = 'admin'
+            session['login_time'] = datetime.now().isoformat()
+            session.permanent = True
+            logger.info(f"Admin login successful from {request.remote_addr}")
+            if request.is_json:
+                return jsonify({'success': True, 'message': 'Login successful'}), 200
+            return redirect(url_for('dashboard'))
+        else:
+            logger.warning(f"Failed login attempt for user '{username}' from {request.remote_addr}")
+            return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Login failed'}), 500
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    """Admin logout"""
+    username = session.get('admin_id', 'unknown')
+    session.clear()
+    logger.info(f"Admin logout: {username} from {request.remote_addr}")
+    return redirect(url_for('login'))
+
+
+@app.route('/api/auth/check', methods=['GET'])
+def check_auth():
+    """Check if user is logged in"""
+    return jsonify({
+        'authenticated': 'admin_id' in session,
+        'login_time': session.get('login_time')
+    }), 200
+
 # Security: Custom error handlers
 @app.errorhandler(400)
 def bad_request(e):
@@ -266,6 +340,7 @@ def internal_error(e):
 # Dashboard Routes
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     """Serve dashboard HTML"""
     return '''
@@ -291,6 +366,12 @@ def dashboard():
                 border-radius: 10px;
                 margin-bottom: 30px;
                 box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .header-content {
+                flex: 1;
             }
             .header h1 {
                 color: #333;
@@ -300,6 +381,32 @@ def dashboard():
                 gap: 10px;
             }
             .header p { color: #666; }
+            
+            .logout-btn {
+                background: #ff6b6b;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 0.9em;
+                transition: 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .logout-btn:hover { background: #ee5a52; }
+            
+            @media (max-width: 768px) {
+                .header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 15px;
+                }
+                .logout-btn {
+                    align-self: flex-end;
+                }
+            }
             
             .stats {
                 display: grid;
@@ -411,8 +518,13 @@ def dashboard():
     <body>
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-chart-bar"></i> GleeJeYly Admin Dashboard</h1>
-                <p>Monitor all orders and reviews</p>
+                <div class="header-content">
+                    <h1><i class="fas fa-chart-bar"></i> GleeJeYly Admin Dashboard</h1>
+                    <p>Monitor all orders and reviews</p>
+                </div>
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
             
             <!-- Statistics -->
@@ -596,6 +708,7 @@ def dashboard():
     '''
 
 @app.route('/api/dashboard/orders', methods=['GET', 'DELETE'])
+@login_required
 @rate_limit
 def dashboard_orders():
     """Get all orders or delete all orders"""
@@ -608,6 +721,7 @@ def dashboard_orders():
         return jsonify({'success': True, 'message': 'All orders deleted'})
 
 @app.route('/api/dashboard/reviews', methods=['GET', 'DELETE'])
+@login_required
 @rate_limit
 def dashboard_reviews():
     """Get all reviews or delete all reviews"""

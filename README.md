@@ -91,6 +91,50 @@ The server will run on `http://localhost:3000` with these endpoints:
    ```
    Then visit `http://localhost:8000`
 
+## Admin Login System 🔐
+
+The dashboard is now protected with admin authentication!
+
+### Default Credentials
+- **Username**: `admin`
+- **Password**: `admin123`
+
+### Login URL
+```
+http://localhost:3000/login
+```
+
+### Features
+✅ **Secure Session Management** - 24-hour session timeout
+✅ **Remember Me** - Saves username to browser (password never saved)
+✅ **Automatic Redirect** - Unauthenticated users redirected to login
+✅ **Activity Logging** - All login attempts logged for security
+✅ **Protected Endpoints** - All dashboard APIs require authentication
+
+### Changing Admin Credentials
+
+**Option 1: Environment Variables (Recommended for Production)**
+```bash
+export ADMIN_USERNAME="your_admin_username"
+export ADMIN_PASSWORD="your_admin_password"
+python server/server.py
+```
+
+**Option 2: Direct Code Update (Development Only)**
+Edit `server/server.py`:
+```python
+ADMIN_USERNAME = 'your_admin_username'
+ADMIN_PASSWORD = 'your_admin_password'
+```
+
+### Security Best Practices
+- ✅ Change default credentials immediately
+- ✅ Use strong passwords (mix of letters, numbers, symbols)
+- ✅ Enable HTTPS in production
+- ✅ Regularly review login logs
+- ✅ Never share admin credentials
+- ✅ Use environment variables for credentials
+
 ### API Documentation
 
 ## Admin Dashboard 📊
@@ -98,6 +142,7 @@ The server will run on `http://localhost:3000` with these endpoints:
 Access the admin dashboard to view all orders and reviews:
 
 **Dashboard URL**: `http://localhost:3000/dashboard`
+**Login URL**: `http://localhost:3000/login`
 
 ### Dashboard Features
 
