@@ -73,6 +73,20 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Topping pricing
+TOPPING_PRICES = {
+    'none': 0.00,
+    'ube': 3.00,
+    'crashed_graham': 2.00
+}
+
+BASE_PRICE = 25.00
+
+def calculate_order_price(quantity, topping='none'):
+    """Calculate total order price"""
+    unit_price = BASE_PRICE + TOPPING_PRICES.get(topping, 0)
+    return round(unit_price * quantity, 2)
+
 # Input validation helper
 def validate_order_input(order):
     """Validate order data"""
@@ -99,17 +113,23 @@ def validate_order_input(order):
     if len(digits_only) < 10:
         return False, "Invalid phone number"
     
-    # Validate flavor
-    valid_flavors = ['plain', 'ube', 'crashed_graham']
-    flavor = order.get('flavor', 'plain')
-    if flavor not in valid_flavors:
-        return False, f"Invalid flavor. Choose from: {', '.join(valid_flavors)}"
+    # Validate topping (new system - optional)
+    valid_toppings = list(TOPPING_PRICES.keys())
+    topping = order.get('topping', 'none')
+    if topping not in valid_toppings:
+        return False, f"Invalid topping. Choose from: {', '.join(valid_toppings)}"
     
     # Truncate strings to prevent abuse
     order['fullName'] = str(order.get('fullName', ''))[:100].strip()
     order['phoneNumber'] = str(order.get('phoneNumber', ''))[:20].strip()
     order['facebook'] = str(order.get('facebook', ''))[:100].strip()
-    order['flavor'] = flavor
+    order['pickupDate'] = str(order.get('pickupDate', ''))[:20].strip()
+    order['topping'] = topping
+    order['quantity'] = qty
+    
+    # Calculate unit price and total price
+    order['unitPrice'] = BASE_PRICE + TOPPING_PRICES[topping]
+    order['totalPrice'] = calculate_order_price(qty, topping)
     
     return True, None
 
@@ -273,6 +293,53 @@ def create_review():
     except Exception as e:
         logger.error(f"Error creating review: {str(e)}")
         return jsonify({'success': False, 'error': 'Failed to process review'}), 400
+
+# ===== PRICING ENDPOINTS =====
+
+@app.route('/api/pricing', methods=['GET'])
+def get_pricing():
+    """Get pricing information for toppings"""
+    return jsonify({
+        'basePrice': BASE_PRICE,
+        'toppings': TOPPING_PRICES
+    }), 200
+
+@app.route('/api/calculate-price', methods=['POST'])
+@rate_limit
+def calculate_price():
+    """Calculate order total price"""
+    try:
+        data = request.get_json(force=True, silent=False)
+        
+        quantity = data.get('quantity', 1)
+        topping = data.get('topping', 'none')
+        
+        # Validate inputs
+        try:
+            quantity = int(quantity)
+            if quantity < 1 or quantity > 100:
+                return jsonify({'success': False, 'error': 'Invalid quantity'}), 400
+        except (ValueError, TypeError):
+            return jsonify({'success': False, 'error': 'Invalid quantity'}), 400
+        
+        if topping not in TOPPING_PRICES:
+            return jsonify({'success': False, 'error': 'Invalid topping'}), 400
+        
+        # Calculate price
+        unit_price = BASE_PRICE + TOPPING_PRICES[topping]
+        total_price = calculate_order_price(quantity, topping)
+        
+        return jsonify({
+            'success': True,
+            'basePrice': BASE_PRICE,
+            'toppingPrice': TOPPING_PRICES[topping],
+            'unitPrice': unit_price,
+            'quantity': quantity,
+            'totalPrice': total_price
+        }), 200
+    except Exception as e:
+        logger.error(f"Error calculating price: {str(e)}")
+        return jsonify({'success': False, 'error': 'Failed to calculate price'}), 400
 
 # ===== AUTHENTICATION ROUTES =====
 
