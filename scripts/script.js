@@ -1,11 +1,34 @@
-// API base (local dev). Change if deploying to a different host.
-const API_BASE = 'http://localhost:3000/api';
+// API base - uses current domain by default, override with window.API_URL if needed
+const API_BASE = window.API_URL || `${window.location.protocol}//${window.location.hostname}:3000/api`;
+// Security: Request timeout (ms)
+const REQUEST_TIMEOUT = 10000;
 // Cheesecake Product Price
 const PRODUCT_PRICE = 25.00;
 const REVIEWS_STORAGE_KEY = 'gleejeyly_reviews';
 
 // Reviews - try API first, fallback to localStorage
 let reviews = [];
+
+// Security: Fetch wrapper with timeout and error handling
+async function secureFetch(url, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            throw new Error('Request timeout');
+        }
+        throw error;
+    }
+}
 
 function loadReviewsFromStorage() {
     const stored = localStorage.getItem(REVIEWS_STORAGE_KEY);
@@ -23,7 +46,7 @@ function saveReviewsToStorage() {
 async function loadReviews() {
     // Try API
     try {
-        const res = await fetch(`${API_BASE}/reviews`, { method: 'GET' });
+        const res = await secureFetch(`${API_BASE}/reviews`, { method: 'GET' });
         if (res.ok) {
             reviews = await res.json();
             // Mirror to localStorage for offline
@@ -33,9 +56,10 @@ async function loadReviews() {
         }
     } catch (e) {
         // network error -> fallback
+        console.warn('Failed to load reviews from API:', e.message);
     }
 
-    // Fallback
+    // Fallback to localStorage
     reviews = loadReviewsFromStorage();
     displayReviews();
 }
@@ -52,21 +76,19 @@ function escapeHTML(str) {
 
 async function saveReviewToAPI(review) {
     try {
-        const res = await fetch(`${API_BASE}/reviews`, {
+        const res = await secureFetch(`${API_BASE}/reviews`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(review)
         });
         if (res.ok) {
             const data = await res.json();
-            if (data && data.reviews) {
-                reviews = data.reviews;
+            if (data && data.success) {
+                return true;
             }
-            saveReviewsToStorage();
-            return true;
         }
     } catch (e) {
-        // ignore
+        console.warn('Failed to save review to API:', e.message);
     }
     return false;
 }
@@ -246,30 +268,27 @@ function initOrderForm() {
                 createdAt: new Date().toISOString()
             };
 
-            // Try to save order to API (best-effort)
+            // Save order to database
             try {
-                await fetch(`${API_BASE}/orders`, {
+                const response = await secureFetch(`${API_BASE}/orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
                 });
+                if (!response.ok) {
+                    throw new Error('Failed to save order');
+                }
             } catch (e) {
-                // ignore API errors; proceed with existing flow
+                console.error('Error saving order:', e.message);
+                alert('Error saving your order. Please try again.');
+                return;
             }
-
-            // Prepare message for WhatsApp or Messenger
-            const message = `Order from ${fullName}%0APhone: ${phoneNumber}%0AFacebook: ${facebook}%0APickup Date: ${pickupDate}%0AQuantity: ${quantity} pcs%0ATotal: ₱${total}`;
 
             // Show success modal
             showSuccessModal();
 
             // Reset form
             orderForm.reset();
-
-            // Redirect to WhatsApp after a delay
-            setTimeout(() => {
-                window.location.href = `https://wa.me/639123456789?text=${message}`;
-            }, 2000);
         } else {
             // Find the first invalid field and scroll to it
             const invalidField = orderForm.querySelector('.form-group.invalid input, .form-group.invalid select, .form-group.invalid .qty-display');

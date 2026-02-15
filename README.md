@@ -57,11 +57,17 @@ npm start
 ```
 
 The server will run on `http://localhost:3000` with these endpoints:
+- `GET /` - Server root/health message
 - `GET /api/health` - Server health check
 - `GET /api/orders` - Retrieve all orders
 - `POST /api/orders` - Submit a new order
 - `GET /api/reviews` - Retrieve all reviews
 - `POST /api/reviews` - Submit a new review
+- `GET /dashboard` - **Admin Dashboard** (View all orders & reviews)
+- `GET /api/dashboard/orders` - Get all orders (JSON format)
+- `GET /api/dashboard/reviews` - Get all reviews (JSON format)
+- `DELETE /api/dashboard/orders` - Clear all orders
+- `DELETE /api/dashboard/reviews` - Clear all reviews
 
 #### Open the Frontend
 
@@ -84,6 +90,44 @@ The server will run on `http://localhost:3000` with these endpoints:
    python3 -m http.server 8000
    ```
    Then visit `http://localhost:8000`
+
+### API Documentation
+
+## Admin Dashboard 📊
+
+Access the admin dashboard to view all orders and reviews:
+
+**Dashboard URL**: `http://localhost:3000/dashboard`
+
+### Dashboard Features
+
+✅ **Real-Time Statistics**
+- Total Orders count
+- Total Reviews count
+- Total Revenue (sum of all orders)
+- Average Product Rating
+
+✅ **Orders Table**
+- View all customer orders with details:
+  - Order ID, Customer Name, Phone, Facebook
+  - Pickup/Delivery Date, Quantity, Total Price
+  - Order creation date
+- Export orders as JSON
+- Clear all orders (with confirmation)
+
+✅ **Reviews Table**
+- View all customer reviews:
+  - Customer name & email
+  - Product rating (⭐⭐⭐⭐⭐)
+  - Service rating (⭐⭐⭐⭐⭐)
+  - Review comment (preview)
+  - Review date
+- Export reviews as JSON
+- Clear all reviews (with confirmation)
+
+✅ **Auto-Refresh**
+- Dashboard automatically refreshes every 30 seconds
+- See live updates without manual refresh
 
 ### API Documentation
 
@@ -110,6 +154,32 @@ Submit a new review
   "serviceRating": 5,
   "comment": "Absolutely delicious! Highly recommended."
 }
+```
+
+#### GET /api/dashboard/orders
+Get all orders in JSON format
+```bash
+curl http://localhost:3000/api/dashboard/orders
+```
+Returns array of all orders
+
+#### GET /api/dashboard/reviews
+Get all reviews in JSON format
+```bash
+curl http://localhost:3000/api/dashboard/reviews
+```
+Returns array of all reviews
+
+#### DELETE /api/dashboard/orders
+Clear all orders (requires confirmation in UI)
+```bash
+curl -X DELETE http://localhost:3000/api/dashboard/orders
+```
+
+#### DELETE /api/dashboard/reviews
+Clear all reviews (requires confirmation in UI)
+```bash
+curl -X DELETE http://localhost:3000/api/dashboard/reviews
 ```
 
 ## Troubleshooting
@@ -190,8 +260,76 @@ Share this link with anyone to let them order cheesecake! 🍰
 
 - The frontend gracefully falls back to localStorage if the API is unavailable
 - All data is stored in JSON files in `server/data/`
-- The API is configured with CORS to allow requests from anywhere
+- The API is configured with CORS to allow requests from specific origins
 - Railway automatically manages environment variables and PORT configuration
+
+## Security Features
+
+### Backend Security (`server.py`)
+
+✅ **CORS Protection**: Restricted to allowed origins (configurable via `ALLOWED_ORIGINS` environment variable)
+✅ **Input Validation**: All user inputs are validated and sanitized
+- Order validation: Checks required fields, quantity limits (1-100), phone number format
+- Review validation: Validates email format, ratings (1-5), and truncates strings
+
+✅ **Rate Limiting**: Prevents abuse with 100 requests per minute per IP
+✅ **Request Size Limit**: Maximum 1MB payload to prevent DoS attacks
+✅ **Security Headers**:
+- `X-Content-Type-Options: nosniff` - Prevents MIME sniffing
+- `X-Frame-Options: DENY` - Prevents clickjacking
+- `X-XSS-Protection: 1; mode=block` - XSS protection
+- `Strict-Transport-Security` - Enforces HTTPS when deployed
+
+✅ **Error Handling**: Generic error messages (no sensitive data leakage)
+✅ **Logging**: All suspicious activities are logged for monitoring
+✅ **Localhost Binding**: Server binds to 127.0.0.1 by default (not 0.0.0.0)
+
+### Frontend Security (`script.js`)
+
+✅ **HTML Escaping**: All user-generated content is escaped before displaying
+✅ **Request Timeout**: 10-second timeout on all API requests
+✅ **Secure Fetch Wrapper**: Custom fetch with abort signal and error handling
+✅ **Dynamic API URL**: Takes into account current domain for flexible deployment
+✅ **Local Storage Fallback**: Graceful degradation with encrypted/scoped storage key
+
+### HTML Security (`index.html`)
+
+✅ **Meta Tags**: Proper character encoding and viewport settings
+✅ **CSP-Ready**: Structure supports Content Security Policy headers
+✅ **Semantic HTML**: Proper use of semantic elements
+✅ **ARIA Labels**: Screen reader accessible form fields
+
+### Deployment Security Checklist
+
+When deploying to production:
+
+1. **Environment Variables**:
+   ```bash
+   export ALLOWED_ORIGINS="https://yourdomain.com,https://www.yourdomain.com"
+   export FLASK_DEBUG=False
+   export PORT=3000
+   ```
+
+2. **Enable HTTPS**: Always use HTTPS in production (handled by Railway)
+
+3. **Update API URL**: Set `window.API_URL` in your hosting template:
+   ```html
+   <script>
+     window.API_URL = 'https://api.yourdomain.com/api';
+   </script>
+   ```
+
+4. **Monitor Logs**: Check server logs for suspicious patterns
+
+5. **Database Backups**: Regularly backup `server/data/` files
+
+6. **Rate Limiting**: Adjust `RATE_LIMIT` based on your traffic needs
+
+### Known Limitations
+
+- No authentication/authorization (suitable for public submissions)
+- JSON file storage (not suitable for high-traffic production)
+- For enterprise use, migrate to a proper database with user authentication
 
 ## License
 
@@ -200,3 +338,4 @@ MIT License - Feel free to use this project as a template for your own cheesecak
 ---
 
 Made with ❤️ by GleeJeYly Team
+
