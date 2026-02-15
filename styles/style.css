@@ -342,7 +342,7 @@ nav ul li a:hover::after {
     text-align: center;
     font-size: 3rem;
     color: var(--dark);
-    margin-bottom: 20px;
+    margin-bottom: 60px;
     font-weight: 700;
     letter-spacing: -0.6px;
     position: relative;
@@ -361,37 +361,49 @@ nav ul li a:hover::after {
     border-radius: 3px;
 }
 
-.product-grid {
+.products-showcase {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 70px;
-    align-items: center;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    align-items: stretch;
 }
 
-.product-visual {
+.product-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(232, 112, 79, 0.1), 0 4px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(232, 112, 79, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 28px 60px rgba(232, 112, 79, 0.18), 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: rgba(232, 112, 79, 0.2);
+}
+
+.product-image-wrapper {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
 }
 
 .product-image {
-    width: 340px;
-    height: 340px;
-    background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
-    border-radius: 30px;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 5.5rem;
-    color: var(--primary);
-    box-shadow: 0 28px 90px rgba(232, 112, 79, 0.2), 0 8px 30px rgba(232, 112, 79, 0.08);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    border: 2px solid rgba(232, 112, 79, 0.1);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.product-image:hover {
-    transform: scale(1.08) translateY(-8px);
-    box-shadow: 0 40px 100px rgba(232, 112, 79, 0.25), 0 0 80px rgba(232, 112, 79, 0.12);
+.product-card:hover .product-image {
+    transform: scale(1.08);
 }
 
 .cheesecake-img {
@@ -400,87 +412,60 @@ nav ul li a:hover::after {
     object-fit: cover;
 }
 
-.product-info h3 {
+.product-card-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-card h3 {
     font-family: 'Dancing Script', cursive;
-    font-size: 2.6rem;
-    color: var(--dark);
-    margin-bottom: 38px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-}
-
-.product-descriptions {
-    background: linear-gradient(135deg, var(--accent) 0%, rgba(249, 228, 212, 0.7) 100%);
-    padding: 32px;
-    border-radius: 16px;
-    margin-bottom: 38px;
-    border: 1px solid rgba(232, 112, 79, 0.12);
-    box-shadow: 0 8px 24px rgba(232, 112, 79, 0.1);
-    transition: all 0.3s ease;
-}
-
-.product-descriptions h4 {
+    font-size: 1.8rem;
     color: var(--dark);
     margin-bottom: 15px;
-    font-size: 1.1rem;
-}
-
-.product-description {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(232, 112, 79, 0.2);
-}
-
-.product-description:last-child {
-    border-bottom: none;
-}
-
-.product-description-name {
-    font-weight: 600;
-    color: var(--primary);
-}
-
-.product-description-desc {
-    color: var(--text-light);
-}
-
-.pricing {
-    background: linear-gradient(135deg, var(--secondary) 0%, rgba(244, 212, 200, 0.8) 100%);
-    padding: 35px;
-    border-radius: 16px;
-    margin-bottom: 35px;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(232, 112, 79, 0.12);
-    border: 1px solid rgba(232, 112, 79, 0.1);
-}
-
-.price-item h5 {
-    font-size: 3.2rem;
-    color: var(--primary);
-    margin-bottom: 14px;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.2px;
 }
 
-.price-item p {
-    font-weight: 700;
-    color: var(--dark);
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
+.product-description-short {
+    flex-grow: 1;
+    margin-bottom: 20px;
 }
 
-.price-item small {
+.product-description-short p {
     color: var(--text-light);
+    line-height: 1.6;
     font-size: 0.95rem;
-    font-weight: 500;
 }
 
-.highlight {
-    text-align: center;
+.product-price {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--accent) 0%, rgba(249, 228, 212, 0.6) 100%);
+    border-radius: 12px;
+}
+
+.product-price .price {
+    font-size: 2rem;
     color: var(--primary);
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.product-price small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.btn-small {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    text-align: center;
 }
 
 /* ===== FAQ SECTION ===== */
@@ -1380,35 +1365,31 @@ footer p {
         letter-spacing: -0.3px;
     }
     
-    .product-grid {
+    .products-showcase {
         grid-template-columns: 1fr;
-        gap: 45px;
+        gap: 30px;
     }
     
-    .product-image {
-        width: 290px;
-        height: 290px;
-        margin: 0 auto;
-        font-size: 4.6rem;
-        border-radius: 24px;
+    .product-image-wrapper {
+        height: 250px;
     }
     
-    .product-info h3 {
-        font-size: 2.1rem;
-        margin-bottom: 28px;
-        letter-spacing: -0.2px;
-    }
-    
-    .price-item h5 {
-        font-size: 2.6rem;
-        margin-bottom: 10px;
-    }
-    
-    .product-descriptions {
+    .product-card-content {
         padding: 22px;
-        margin-bottom: 28px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, rgba(249, 228, 212, 0.8), rgba(244, 212, 200, 0.5));
+    }
+    
+    .product-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+    }
+    
+    .product-price .price {
+        font-size: 1.6rem;
+    }
+    
+    .btn-small {
+        padding: 11px 22px;
+        font-size: 0.9rem;
     }
     
     .faq {
@@ -1985,10 +1966,16 @@ footer p {
         font-size: 1.6rem;
     }
     
-    .product-image {
-        width: 200px;
+    .product-image-wrapper {
         height: 200px;
-        font-size: 3.5rem;
+    }
+    
+    .product-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .product-price .price {
+        font-size: 1.4rem;
     }
     
     .btn {
