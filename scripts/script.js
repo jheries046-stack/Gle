@@ -5,6 +5,10 @@ const API_BASE = 'https://YOUR-RAILWAY-URL.up.railway.app/api';
 const REQUEST_TIMEOUT = 10000;
 // Cheesecake Product Price
 const PRODUCT_PRICE = 25.00;
+// Topping prices (client-side fallback)
+const TOPPING_PRICES = { none: 0.00, ube: 3.00, crashed_graham: 2.00 };
+// Holds the most recent order for confirmation modal
+let lastOrder = null;
 const REVIEWS_STORAGE_KEY = 'gleejeyly_reviews';
 
 // Mobile detection
@@ -287,6 +291,14 @@ function initOrderForm() {
         });
     });
     
+    // Add topping selection listeners
+    const toppingOptions = document.querySelectorAll('input[name="topping"]');
+    toppingOptions.forEach(option => {
+        option.addEventListener('change', () => {
+            updateOrderSummary();
+        });
+    });
+    
     // Add real-time validation listeners
     const fullNameInput = document.getElementById('fullName');
     const phoneInput = document.getElementById('phoneNumber');
@@ -340,19 +352,43 @@ function initOrderForm() {
             const facebook = document.getElementById('facebook').value;
             const pickupDate = document.getElementById('pickupDate').value;
             const quantity = parseInt(document.getElementById('quantityValue').value) || 1;
-            const flavor = document.querySelector('input[name="flavor"]:checked').value;
-            const total = PRODUCT_PRICE * quantity;
+            const base = document.querySelector('input[name="base"]:checked').value || 'plain';
+            const topping = document.querySelector('input[name="topping"]:checked')?.value || 'none';
+
+            // Try to get accurate prices from backend calculate-price endpoint
+            let unitPrice = PRODUCT_PRICE + (TOPPING_PRICES[topping] || 0);
+            let totalPrice = unitPrice * quantity;
+            try {
+                const res = await secureFetch(`${API_BASE}/calculate-price`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quantity, topping })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.success) {
+                        unitPrice = data.unitPrice;
+                        totalPrice = data.totalPrice;
+                    }
+                }
+            } catch (err) {
+                console.warn('Price API unavailable, using client-side prices');
+            }
 
             const order = {
                 fullName,
                 phoneNumber,
                 facebook,
-                flavor,
+                base,
+                topping,
                 pickupDate,
                 quantity,
-                total,
+                unitPrice,
+                totalPrice,
                 createdAt: new Date().toISOString()
             };
+            // store for modal display
+            lastOrder = order;
 
             // Save order to database
             try {
@@ -364,6 +400,9 @@ function initOrderForm() {
                 if (!response.ok) {
                     throw new Error('Failed to save order');
                 }
+                const created = await response.json();
+                // prefer server response (includes id); merge with local order as fallback
+                lastOrder = Object.assign({}, order, created || {});
             } catch (e) {
                 console.error('Error saving order:', e.message);
                 showToast('Error saving your order. Please try again.', 'error');
@@ -396,26 +435,49 @@ function initOrderForm() {
 
 function updateOrderSummary() {
     const quantity = parseInt(document.getElementById('quantityValue').value) || 1;
-    const unitPrice = PRODUCT_PRICE;
-    const total = unitPrice * quantity;
-    const flavorElement = document.querySelector('input[name="flavor"]:checked');
-    
-    // Get flavor display name
-    let flavorName = 'Plain Classic';
-    if (flavorElement) {
-        const flavorValue = flavorElement.value;
-        if (flavorValue === 'ube') flavorName = 'Ube Jam';
-        else if (flavorValue === 'crashed_graham') flavorName = 'Extra Crashed Graham';
-    }
-    
-    // Update summary display
-    const qtyDisplay = document.getElementById('summaryQty');
-    const totalDisplay = document.getElementById('summaryTotal');
-    const flavorDisplay = document.getElementById('summaryFlavor');
-    
-    if (qtyDisplay) qtyDisplay.textContent = quantity;
-    if (totalDisplay) totalDisplay.textContent = `₱${total.toFixed(2)}`;
-    if (flavorDisplay) flavorDisplay.textContent = flavorName;
+    const topping = document.querySelector('input[name="topping"]:checked')?.value || 'none';
+
+    // Determine display name and topping price
+    let toppingName = 'None';
+    if (topping === 'ube') toppingName = 'Ube Jam';
+    else if (topping === 'crashed_graham') toppingName = 'Extra Crashed Graham';
+    const toppingPrice = TOPPING_PRICES[topping] || 0;
+
+    // Try backend price calculation, fallback to client calc
+    let unitPrice = PRODUCT_PRICE + toppingPrice;
+    let total = unitPrice * quantity;
+
+    (async () => {
+        try {
+            const res = await secureFetch(`${API_BASE}/calculate-price`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity, topping })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.success) {
+                    unitPrice = data.unitPrice;
+                    total = data.totalPrice;
+                }
+            }
+        } catch (e) {
+            // ignore and use client-side calc
+        }
+
+        // Update summary display
+        const qtyDisplay = document.getElementById('summaryQty');
+        const totalDisplay = document.getElementById('summaryTotal');
+        const toppingDisplay = document.getElementById('summaryTopping');
+        const toppingPriceDisplay = document.getElementById('summaryToppingPrice');
+        const subtotalDisplay = document.getElementById('summarySubtotal');
+
+        if (qtyDisplay) qtyDisplay.textContent = quantity;
+        if (totalDisplay) totalDisplay.textContent = `₱${Number(total).toFixed(2)}`;
+        if (toppingDisplay) toppingDisplay.textContent = toppingName;
+        if (toppingPriceDisplay) toppingPriceDisplay.textContent = `₱${Number(toppingPrice).toFixed(2)}`;
+        if (subtotalDisplay) subtotalDisplay.textContent = `₱${Number(unitPrice * quantity).toFixed(2)}`;
+    })();
 }
 // Real-time field validation helper
 function validateFieldRealTime(element) {
@@ -520,6 +582,28 @@ function showSuccessModal() {
     const closeBtn = document.getElementById('closeModalBtn');
     
     if (modal) {
+        // populate modal from lastOrder if available
+        if (lastOrder) {
+            const o = lastOrder;
+            const fmt = (v) => '₱' + Number(v || 0).toFixed(2);
+            const toppingPrice = (o.toppingPrice != null) ? o.toppingPrice : ( (o.unitPrice != null) ? (o.unitPrice - PRODUCT_PRICE) : 0 );
+            const pickup = o.pickupDate || o.pickup || '—';
+
+            const el = (id, val) => {
+                const node = document.getElementById(id);
+                if (node) node.textContent = val;
+            };
+
+            el('modalOrderId', o.id || '—');
+            el('modalBase', o.base || 'Plain Classic');
+            el('modalTopping', o.topping || 'None');
+            el('modalToppingPrice', `(${fmt(toppingPrice)})`);
+            el('modalUnitPrice', fmt(o.unitPrice || o.price || PRODUCT_PRICE));
+            el('modalQuantity', o.quantity || 1);
+            el('modalPickupDate', pickup);
+            el('modalTotalPrice', fmt(o.totalPrice || o.total || ( (o.unitPrice || PRODUCT_PRICE) * (o.quantity || 1) )));
+        }
+
         modal.classList.add('show');
         
         // Close modal when clicking the button (listen once to avoid duplicates)

@@ -457,10 +457,20 @@
             </div>
             <h3>Order Saved Successfully! ✓</h3>
             <p>Thank you for your order! Your order has been saved to our system.</p>
+
             <div class="modal-contact">
-                <p><strong>Order Details:</strong></p>
-                <p>We'll review your order and contact you within 24 hours via your phone number or Facebook account to confirm the final details and payment.</p>
+                <p><strong>Order Details</strong></p>
+                <div class="modal-order-row"><strong>Order ID:</strong> <span id="modalOrderId">—</span></div>
+                <div class="modal-order-row"><strong>Product:</strong> <span id="modalBase">Plain Classic</span></div>
+                <div class="modal-order-row"><strong>Topping:</strong> <span id="modalTopping">None</span> <em id="modalToppingPrice">(₱0.00)</em></div>
+                <div class="modal-order-row"><strong>Unit Price:</strong> <span id="modalUnitPrice">₱25.00</span></div>
+                <div class="modal-order-row"><strong>Quantity:</strong> <span id="modalQuantity">1</span></div>
+                <div class="modal-order-row"><strong>Pickup/Delivery:</strong> <span id="modalPickupDate">—</span></div>
+                <div class="modal-divider"></div>
+                <div class="modal-order-row total"><strong>Total:</strong> <span id="modalTotalPrice">₱25.00</span></div>
+                <p>We'll contact you within 24 hours via your phone number or Facebook account to confirm final details and payment.</p>
             </div>
+
             <button id="closeModalBtn" class="btn btn-modal">Close</button>
         </div>
     </div>
