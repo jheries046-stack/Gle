@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template, redirect, url_for, session
+from flask import Flask, jsonify, request, render_template, redirect, url_for, session, send_from_directory
 from flask_cors import CORS
 import json
 import os
@@ -208,10 +208,24 @@ def write_reviews(reviews):
 
 @app.route('/', methods=['GET'])
 def index():
-    return jsonify({
-        'message': 'GleeJeYly API Server (Python)',
-        'version': '1.0.0'
-    })
+    # Serve the main frontend page
+    try:
+        return send_from_directory('.', 'index.html')
+    except Exception:
+        return jsonify({'message': 'GleeJeYly API Server (Python)', 'version': '1.0.0'})
+
+
+# Serve static files (html, css, js, images, sw)
+@app.route('/<path:filename>', methods=['GET'])
+def serve_static(filename):
+    # Protect API and internal routes
+    if filename.startswith('api/') or filename.startswith('server'):
+        return jsonify({'success': False, 'error': 'Not found'}), 404
+
+    fullpath = os.path.join(os.getcwd(), filename)
+    if os.path.exists(fullpath):
+        return send_from_directory('.', filename)
+    return jsonify({'success': False, 'error': 'Not found'}), 404
 
 @app.route('/api/health', methods=['GET'])
 def health():
@@ -249,9 +263,11 @@ def create_order():
         write_orders(orders)
         
         logger.info(f"Order created: {order['id']}")
+        # Return the created order so clients can read id and server-calculated totals
         return jsonify({
             'success': True,
-            'message': 'Order created successfully'
+            'message': 'Order created successfully',
+            'order': order
         }), 201
     except Exception as e:
         logger.error(f"Error creating order: {str(e)}")
@@ -651,7 +667,7 @@ def dashboard():
         </div>
         
         <script>
-            const API_BASE = 'http://localhost:3000/api';
+            const API_BASE = '/api';
             
             async function loadDashboardData() {
                 try {
@@ -680,19 +696,22 @@ def dashboard():
                     return;
                 }
                 
-                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Facebook</th><th>Flavor</th><th>Date</th><th>Qty</th><th>Total</th><th>Created</th></tr></thead><tbody>';
+                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Facebook</th><th>Topping</th><th>Date</th><th>Qty</th><th>Unit</th><th>Total</th><th>Created</th></tr></thead><tbody>';
                 orders.forEach(order => {
-                    const flavorName = order.flavor === 'ube' ? 'Ube Jam' : order.flavor === 'crashed_graham' ? 'Extra Crashed Graham' : 'Plain Classic';
+                    const toppingName = order.topping === 'ube' ? 'Ube Jam' : order.topping === 'crashed_graham' ? 'Extra Crashed Graham' : 'Plain Classic';
+                    const unitPrice = (order.unitPrice != null) ? order.unitPrice : (order.price || 0);
+                    const totalPrice = (order.totalPrice != null) ? order.totalPrice : (order.total || 0);
                     
                     html += `<tr>
                         <td>#${order.id}</td>
                         <td>${order.fullName}</td>
                         <td>${order.phoneNumber}</td>
                         <td>${order.facebook}</td>
-                        <td>${flavorName}</td>
+                        <td>${toppingName}</td>
                         <td>${order.pickupDate}</td>
                         <td>${order.quantity}</td>
-                        <td>₱${order.total}</td>
+                        <td>₱${Number(unitPrice).toFixed(2)}</td>
+                        <td>₱${Number(totalPrice).toFixed(2)}</td>
                         <td>${new Date(order.createdAt).toLocaleDateString()}</td>
                     </tr>`;
                 });
@@ -728,7 +747,7 @@ def dashboard():
                 document.getElementById('orderCount').textContent = orders.length;
                 document.getElementById('reviewCount').textContent = reviews.length;
                 
-                const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+                const totalRevenue = orders.reduce((sum, o) => sum + ((o.totalPrice != null) ? o.totalPrice : (o.total || 0)), 0);
                 document.getElementById('totalRevenue').textContent = '₱' + totalRevenue.toFixed(2);
                 
                 if (reviews.length > 0) {
@@ -817,6 +836,31 @@ def set_security_headers(response):
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    # Referrer policy
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    # Permissions policy (restrict powerful features)
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=(), payment=()'
+
+    # Content Security Policy - adjust allowed external resources as needed
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdnjs.cloudflare.com https://elfsightcdn.com; "
+        "style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://elfsightcdn.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; "
+        "img-src 'self' data:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "object-src 'none'; "
+        "base-uri 'self';"
+    )
+    response.headers['Content-Security-Policy'] = csp
+
+    # Remove or override server header to avoid exposing implementation
+    try:
+        if 'Server' in response.headers:
+            del response.headers['Server']
+    except Exception:
+        pass
     return response
 
 if __name__ == '__main__':

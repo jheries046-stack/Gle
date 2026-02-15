@@ -1,6 +1,6 @@
 // API base - Railway backend URL (update with your Railway app URL)
-// Example: const API_BASE = 'https://gle-production.up.railway.app/api';
-const API_BASE = 'https://YOUR-RAILWAY-URL.up.railway.app/api';
+// Use relative API root when served from the same origin
+const API_BASE = '/api';
 // Security: Request timeout (ms)
 const REQUEST_TIMEOUT = 10000;
 // Cheesecake Product Price
@@ -18,6 +18,9 @@ const isTouchDevice = () => {
             (navigator.maxTouchPoints > 0) ||
             (navigator.msMaxTouchPoints > 0));
 };
+
+// Init guards to prevent double-binding when script is injected multiple times
+window.GLE_INIT_DONE = window.GLE_INIT_DONE || {};
 
 // Reviews - try API first, fallback to localStorage
 let reviews = [];
@@ -120,16 +123,46 @@ async function saveReviewToAPI(review) {
     return false;
 }
 
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initMobileOptimizations();
-    initNavigation();
-    initFAQ();
-    initOrderForm();
-    initReviewForm();
-    // Load reviews after review form is initialized
-    loadReviews();
-});
+// Central page initializer: runs only relevant initializers and guards against duplicate runs
+function runPageInit() {
+    // Mobile optimizations (safe to run once)
+    if (!window.GLE_INIT_DONE.mobileOpt) {
+        initMobileOptimizations();
+        window.GLE_INIT_DONE.mobileOpt = true;
+    }
+
+    // Navigation (once)
+    if (!window.GLE_INIT_DONE.navigation) {
+        initNavigation();
+        window.GLE_INIT_DONE.navigation = true;
+    }
+
+    // FAQ section
+    if (document.querySelector('.faq') && !window.GLE_INIT_DONE.faq) {
+        initFAQ();
+        window.GLE_INIT_DONE.faq = true;
+    }
+
+    // Order form
+    if (document.getElementById('orderForm') && !window.GLE_INIT_DONE.orderForm) {
+        initOrderForm();
+        window.GLE_INIT_DONE.orderForm = true;
+    }
+
+    // Review form
+    if (document.getElementById('reviewForm') && !window.GLE_INIT_DONE.reviewForm) {
+        initReviewForm();
+        window.GLE_INIT_DONE.reviewForm = true;
+        // Load reviews after review form is initialized
+        if (typeof loadReviews === 'function') loadReviews();
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runPageInit);
+} else {
+    runPageInit();
+}
 
 // Mobile optimizations
 function initMobileOptimizations() {
@@ -605,12 +638,21 @@ function showSuccessModal() {
         }
 
         modal.classList.add('show');
-        
+
+        // focus management: move focus into modal and trap it
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+            // remember last focused element
+            try { window.__gle_last_focused = document.activeElement; } catch (e) { window.__gle_last_focused = null; }
+            content.focus();
+            trapFocus(modal);
+        }
+
         // Close modal when clicking the button (listen once to avoid duplicates)
         if (closeBtn) {
             closeBtn.addEventListener('click', closeSuccessModal, { once: true });
         }
-        
+
         // Close modal when clicking outside (listen once)
         modal.addEventListener('click', function onClickOutside(e) {
             if (e.target === modal) {
@@ -624,7 +666,57 @@ function closeSuccessModal() {
     const modal = document.getElementById('successModal');
     if (modal) {
         modal.classList.remove('show');
+        // release focus trap and restore focus
+        releaseFocus(modal);
+        try { if (window.__gle_last_focused) window.__gle_last_focused.focus(); } catch (e) {}
     }
+}
+
+// Focus trap helpers for modal accessibility
+function trapFocus(modal) {
+    if (!modal) return;
+    const focusable = modal.querySelectorAll('a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])');
+    if (!focusable || focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    function keyListener(e) {
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        } else if (e.key === 'Escape') {
+            closeSuccessModal();
+        }
+    }
+
+    modal.__gle_key_listener = keyListener;
+    document.addEventListener('keydown', keyListener);
+}
+
+function releaseFocus(modal) {
+    if (!modal) return;
+    if (modal.__gle_key_listener) {
+        document.removeEventListener('keydown', modal.__gle_key_listener);
+        delete modal.__gle_key_listener;
+    }
+}
+
+// Register service worker (best-effort) to enable offline caching
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+        console.log('ServiceWorker registered:', reg.scope);
+    }).catch(err => {
+        console.warn('ServiceWorker registration failed:', err);
+    });
 }
 
 // 4. Review Form Handler

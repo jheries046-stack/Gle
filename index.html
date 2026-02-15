@@ -27,50 +27,13 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="styles/style.css">
     
-    <!-- Critical CSS -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: #4A3728;
-            background-color: #FBF8F5;
-        }
-    </style>
+    <!-- Critical CSS moved to styles/style.css -->
 </head>
 <body>
     <!-- Skip to Main Content Link -->
     <a href="#main" class="skip-link">Skip to main content</a>
     
-    <!-- Header -->
-    <header id="header">
-        <div class="container header-container">
-            <a href="#" class="logo" aria-label="GleeJeYly Home">
-                <img src="images/logo.svg" alt="GleeJeYly Logo" class="logo-image">
-            </a>
-            
-            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-expanded="false" aria-controls="navMenu">
-                <span class="sr-only">Menu</span>
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <nav aria-label="Main Navigation">
-                <ul id="navMenu">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#product">Product</a></li>
-                    <li><a href="#order" class="btn">Order Now</a></li>
-                    <li><a href="#reviews">Reviews</a></li>
-                    <li><a href="#faq">FAQ</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div id="site-header"></div>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -78,7 +41,7 @@
             <h1>GleeJeYly Jelly Cheesecake</h1>
             <p class="tagline">✨ Handcrafted with Love ✨</p>
             <p class="description">Creamy, jelly cheesecake with a delicious crushed graham base. Perfect for any celebration.</p>
-            <a href="#order" class="btn btn-large">Order Now</a>
+            <a href="order.html" class="btn btn-large">Order Now</a>
         </div>
     </section>
 
@@ -90,8 +53,8 @@
             <div class="product-grid">
                 <div class="product-visual">
                     <div class="product-image-wrapper">
-                        <div class="product-image">
-                            <img src="images/cheesecake1.jpg" alt="GleeJeYly Jelly Cheesecake" class="cheesecake-img">
+                            <div class="product-image">
+                            <img src="images/cheesecake1.jpg" alt="GleeJeYly Jelly Cheesecake" class="cheesecake-img" width="800" height="600" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -135,7 +98,7 @@
                     </div>
                     
                     <p class="highlight">✨ Made fresh to order ✨</p>
-                    <a href="#order" class="btn btn-medium">Order Now</a>
+                    <a href="order.html" class="btn btn-medium">Order Now</a>
                 </div>
             </div>
         </div>
@@ -442,41 +405,11 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 GleeJeYly. All rights reserved. | Crafting happiness, one cheesecake at a time.</p>
-        </div>
-    </footer>
+    <div id="site-modal"></div>
+    <div id="site-footer"></div>
 
-    <!-- Success Notification Modal -->
-    <div id="successModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Order Saved Successfully! ✓</h3>
-            <p>Thank you for your order! Your order has been saved to our system.</p>
-
-            <div class="modal-contact">
-                <p><strong>Order Details</strong></p>
-                <div class="modal-order-row"><strong>Order ID:</strong> <span id="modalOrderId">—</span></div>
-                <div class="modal-order-row"><strong>Product:</strong> <span id="modalBase">Plain Classic</span></div>
-                <div class="modal-order-row"><strong>Topping:</strong> <span id="modalTopping">None</span> <em id="modalToppingPrice">(₱0.00)</em></div>
-                <div class="modal-order-row"><strong>Unit Price:</strong> <span id="modalUnitPrice">₱25.00</span></div>
-                <div class="modal-order-row"><strong>Quantity:</strong> <span id="modalQuantity">1</span></div>
-                <div class="modal-order-row"><strong>Pickup/Delivery:</strong> <span id="modalPickupDate">—</span></div>
-                <div class="modal-divider"></div>
-                <div class="modal-order-row total"><strong>Total:</strong> <span id="modalTotalPrice">₱25.00</span></div>
-                <p>We'll contact you within 24 hours via your phone number or Facebook account to confirm final details and payment.</p>
-            </div>
-
-            <button id="closeModalBtn" class="btn btn-modal">Close</button>
-        </div>
-    </div>
-
-    <!-- External JavaScript -->
-    <script src="scripts/script.js"></script>
+    <!-- Loader (external, deferrable) -->
+    <script src="scripts/loader.js" defer></script>
 
     <!-- Elfsight Facebook Chat | Untitled Facebook Chat -->
     <script src="https://elfsightcdn.com/platform.js" async></script>

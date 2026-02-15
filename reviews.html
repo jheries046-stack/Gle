@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#E8704F">
+    <title>GleeJeYly - Reviews</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="site-header"></div>
+
+    <section class="reviews" id="reviews">
+        <div class="container">
+            <h2>Customer Reviews & Ratings</h2>
+            
+            <div class="reviews-container">
+                <!-- Review Form -->
+                <div class="review-form-section">
+                    <h3>Share Your Experience</h3>
+                    <form id="reviewForm" novalidate>
+                        <div class="form-group">
+                            <label for="reviewName">Your Name *</label>
+                            <input type="text" id="reviewName" name="reviewName" placeholder="Your name" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reviewEmail">Email *</label>
+                            <input type="email" id="reviewEmail" name="reviewEmail" placeholder="your@email.com" required>
+                            <span class="error-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rate the Product *</label>
+                            <div class="star-rating" id="productRating">
+                                <i class="fas fa-star" data-value="1"></i>
+                                <i class="fas fa-star" data-value="2"></i>
+                                <i class="fas fa-star" data-value="3"></i>
+                                <i class="fas fa-star" data-value="4"></i>
+                                <i class="fas fa-star" data-value="5"></i>
+                            </div>
+                            <input type="hidden" id="productRatingValue" name="productRating" value="0">
+                            <span class="error-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rate Our Service *</label>
+                            <div class="star-rating" id="serviceRating">
+                                <i class="fas fa-star" data-value="1"></i>
+                                <i class="fas fa-star" data-value="2"></i>
+                                <i class="fas fa-star" data-value="3"></i>
+                                <i class="fas fa-star" data-value="4"></i>
+                                <i class="fas fa-star" data-value="5"></i>
+                            </div>
+                            <input type="hidden" id="serviceRatingValue" name="serviceRating" value="0">
+                            <span class="error-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reviewComment">Your Comment *</label>
+                            <textarea id="reviewComment" name="reviewComment" placeholder="Share your thoughts about our cheesecake and service..." rows="5" required></textarea>
+                            <span class="error-msg"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-submit">Submit Review</button>
+                    </form>
+                </div>
+                
+                <!-- Reviews Display -->
+                <div class="reviews-display-section">
+                    <h3>Customer Reviews</h3>
+                    <div id="reviewsList" class="reviews-list"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="site-modal"></div>
+    <div id="site-footer"></div>
+    <script src="scripts/loader.js" defer></script>
+</body>
+</html>
