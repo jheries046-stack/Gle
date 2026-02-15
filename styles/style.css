@@ -813,6 +813,7 @@ nav ul li a:hover::after {
     color: var(--dark);
     letter-spacing: 0.3px;
     font-size: 0.95rem;
+    text-align: left;
 }
 
 .form-group input,
@@ -893,8 +894,8 @@ nav ul li a:hover::after {
 
 .checkbox-label input[type="checkbox"] {
     width: auto;
-    min-width: 20px;
-    height: 20px;
+    min-width: 16px;
+    height: 16px;
     margin-top: 4px;
     cursor: pointer;
     accent-color: var(--primary);
@@ -1024,7 +1025,7 @@ nav ul li a:hover::after {
     display: flex;
     gap: 15px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .qty-btn {
@@ -1102,10 +1103,12 @@ nav ul li a:hover::after {
 .summary-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 14px 0;
     border-bottom: 1px solid rgba(232, 112, 79, 0.25);
     color: var(--text);
     letter-spacing: 0.2px;
+    min-height: 24px;
 }
 
 .summary-row.total {
@@ -1115,6 +1118,8 @@ nav ul li a:hover::after {
     border-bottom: none;
     padding-top: 14px;
     margin-top: 8px;
+    min-height: 30px;
+    align-items: center;
 }
 
 .form-note {
