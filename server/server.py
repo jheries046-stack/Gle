@@ -122,8 +122,10 @@ def create_review():
         }), 400
 
 if __name__ == '__main__':
-    print('🍰 GleeJeYly API server is running on http://localhost:3000')
-    print('📝 Orders API: http://localhost:3000/api/orders')
-    print('⭐ Reviews API: http://localhost:3000/api/reviews')
-    print('💚 Health check: http://localhost:3000/api/health')
-    app.run(host='localhost', port=3000, debug=False)
+    port = int(os.environ.get('PORT', 3000))
+    host = '0.0.0.0'
+    print(f'🍰 GleeJeYly API server is running on port {port}')
+    print('📝 Orders API: /api/orders')
+    print('⭐ Reviews API: /api/reviews')
+    print('💚 Health check: /api/health')
+    app.run(host=host, port=port, debug=False)

@@ -126,11 +126,72 @@ Submit a new review
 **Issue: API calls not working**
 - Solution: Open browser DevTools (F12) → Console tab to see error messages
 
+## Deploying Online (Railway)
+
+### Prerequisites
+- GitHub account
+- Railway account (free at https://railway.app)
+
+### Step 1: Push to GitHub
+
+```bash
+git add .
+git commit -m "Add full-stack Gleejeyly app"
+git push origin main
+```
+
+### Step 2: Deploy to Railway
+
+1. Go to [railway.app](https://railway.app)
+2. Click **"New Project"** → **"Deploy from GitHub Repo"**
+3. Authorize Railway with your GitHub account
+4. Select this repository (`Gle`)
+5. Railway will auto-detect the Python app and deploy
+
+### Step 3: Update Frontend API URL
+
+Once deployed, Railway will provide your app URL (e.g., `https://gleejeyly-production.up.railway.app`).
+
+Update the API base URL in [scripts/script.js](scripts/script.js):
+
+```javascript
+// Change this:
+const API_BASE = 'http://localhost:3000/api';
+
+// To this (replace with your Railway URL):
+const API_BASE = 'https://your-railway-app-url.up.railway.app/api';
+```
+
+### Step 4: Deploy Frontend (Static Hosting)
+
+Option A: **Vercel (Recommended for static sites)**
+1. Go to [vercel.com](https://vercel.com)
+2. Click **"Add New Project"** → **"Import Git Repository"**
+3. Select your repo and deploy
+
+Option B: **GitHub Pages**
+1. Push your updated code to GitHub
+2. Go to repo Settings → Pages
+3. Set source to `main` branch
+
+Option C: **Keep on Railway**
+Railway can serve static files! Just keep both frontend and backend together.
+
+### Mobile Access
+
+Once deployed on Railway, your app will be accessible globally at:
+```
+https://your-railway-app-url.up.railway.app
+```
+
+Share this link with anyone to let them order cheesecake! 🍰
+
 ## Development Notes
 
 - The frontend gracefully falls back to localStorage if the API is unavailable
 - All data is stored in JSON files in `server/data/`
-- The API is configured with CORS to allow requests from `http://localhost:*`
+- The API is configured with CORS to allow requests from anywhere
+- Railway automatically manages environment variables and PORT configuration
 
 ## License
 
