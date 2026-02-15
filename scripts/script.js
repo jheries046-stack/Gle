@@ -1,10 +1,19 @@
-// API base - uses current domain by default, override with window.API_URL if needed
-const API_BASE = window.API_URL || `${window.location.protocol}//${window.location.hostname}:3000/api`;
+// API base - Railway backend URL (update with your Railway app URL)
+// Example: const API_BASE = 'https://gle-production.up.railway.app/api';
+const API_BASE = 'https://YOUR-RAILWAY-URL.up.railway.app/api';
 // Security: Request timeout (ms)
 const REQUEST_TIMEOUT = 10000;
 // Cheesecake Product Price
 const PRODUCT_PRICE = 25.00;
 const REVIEWS_STORAGE_KEY = 'gleejeyly_reviews';
+
+// Mobile detection
+const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isTouchDevice = () => {
+    return (('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) ||
+            (navigator.msMaxTouchPoints > 0));
+};
 
 // Reviews - try API first, fallback to localStorage
 let reviews = [];
@@ -95,6 +104,7 @@ async function saveReviewToAPI(review) {
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    initMobileOptimizations();
     initNavigation();
     initFAQ();
     initOrderForm();
@@ -102,6 +112,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load reviews after review form is initialized
     loadReviews();
 });
+
+// Mobile optimizations
+function initMobileOptimizations() {
+    // Prevent zoom on input focus (iOS)
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            if (isMobile()) {
+                document.body.style.zoom = '100%';
+            }
+        });
+    });
+    
+    // Improve button touch targets
+    const buttons = document.querySelectorAll('button, .btn');
+    buttons.forEach(button => {
+        // Ensure minimum touch target size (48x48px)
+        const style = window.getComputedStyle(button);
+        const height = parseFloat(style.height);
+        if (height < 48) {
+            button.style.minHeight = '48px';
+            button.style.display = 'flex';
+            button.style.alignItems = 'center';
+            button.style.justifyContent = 'center';
+        }
+    });
+    
+    // Add viewport class for JS detection
+    if (isMobile()) {
+        document.documentElement.classList.add('is-mobile');
+    }
+    if (isTouchDevice()) {
+        document.documentElement.classList.add('is-touch');
+    }
+}
 
 // 1. Navigation Manager
 function initNavigation() {

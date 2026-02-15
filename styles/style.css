@@ -810,6 +810,17 @@ nav ul li a:hover::after {
     color: var(--text);
     background: #fafafa;
     letter-spacing: 0.2px;
+    min-height: 50px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+@supports (padding: max(0px)) {
+    .form-group input,
+    .form-group select {
+        padding: max(15px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(15px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    }
 }
 
 .form-group input:focus,
@@ -843,8 +854,8 @@ nav ul li a:hover::after {
 }
 
 .qty-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border: 2px solid var(--primary);
     background: white;
     color: var(--primary);
@@ -853,6 +864,11 @@ nav ul li a:hover::after {
     font-size: 1.2rem;
     font-weight: bold;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .qty-btn:hover {
@@ -864,6 +880,13 @@ nav ul li a:hover::after {
 
 .qty-btn:active {
     transform: scale(0.95);
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .qty-btn:active {
+        background: var(--primary);
+        color: white;
+    }
 }
 
 .qty-display {
@@ -1284,33 +1307,41 @@ footer p {
     }
     
     .form-group {
-        margin-bottom: 18px;
+        margin-bottom: 20px;
     }
     
     .form-group label {
         font-size: 0.9rem;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        font-weight: 600;
     }
     
     .form-group input,
     .form-group select {
-        padding: 12px 16px;
-        font-size: 1rem;
+        padding: 14px 16px;
+        font-size: 16px;
+        min-height: 50px;
+    }
+    
+    .form-group input::-webkit-outer-spin-button,
+    .form-group input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
     
     .quantity-selector {
-        gap: 12px;
+        gap: 16px;
     }
     
     .qty-btn {
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
         font-size: 1.1rem;
     }
     
     .qty-display {
-        min-width: 45px;
-        padding: 8px;
+        min-width: 50px;
+        padding: 10px;
         font-size: 1.1rem;
     }
     
@@ -1347,6 +1378,11 @@ footer p {
     body {
         font-size: 14px;
         line-height: 1.65;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    
+    html {
+        overflow-x: hidden;
     }
     
     .container {
@@ -1360,6 +1396,8 @@ footer p {
         top: 0;
         z-index: 1001;
         border-bottom: 1px solid rgba(232, 112, 79, 0.05);
+        left: 0;
+        right: 0;
     }
     
     .header-container {
@@ -1735,7 +1773,11 @@ footer p {
     }
     
     .btn {
-        padding: 10px 24px;
+        padding: 12px 24px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         font-size: 0.9rem;
     }
 }
@@ -1747,12 +1789,16 @@ footer p {
     left: 0;
     width: 100%;
     height: 100%;
+    max-height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 2000;
     animation: fadeIn 0.3s ease-in-out;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-overlay.show {
@@ -2170,5 +2216,102 @@ footer p {
     .form-group select {
         padding: 10px 12px;
         font-size: 0.95rem;
+    }
+}
+
+/* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .btn:hover {
+        transform: none;
+    }
+    
+    .btn:active {
+        transform: scale(0.98);
+    }
+    
+    nav ul li a:hover {
+        transform: translateX(2px);
+    }
+    
+    /* Remove box shadows that reduce visibility on tap */
+    .form-group input:focus,
+    .form-group select:focus {
+        box-shadow: 0 0 0 3px rgba(232, 112, 79, 0.1), 0 4px 12px rgba(232, 112, 79, 0.15);
+        transform: none;
+    }
+    
+    /* Better tap feedback for buttons */
+    button,
+    .btn,
+    input[type="button"],
+    input[type="submit"] {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Improve scrolling performance */
+    * {
+        -webkit-tap-highlight-color: rgba(232, 112, 79, 0.1);
+        tap-highlight-color: rgba(232, 112, 79, 0.1);
+    }
+}
+
+/* ===== LANDSCAPE MODE OPTIMIZATIONS ===== */
+@media (max-height: 600px) and (orientation: landscape) {
+    header {
+        padding: 8px 0;
+    }
+    
+    .hero {
+        padding: 40px 20px;
+        min-height: auto;
+    }
+    
+    .hero h1 {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+    
+    section {
+        padding: 40px 20px;
+    }
+    
+    .order-form-section {
+        max-height: 75vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ===== SMOOTH SCROLLING FOR MOBILE ===== */
+@supports (scroll-behavior: smooth) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS FOR MOBILE ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===== NOTCH/SAFE AREA SUPPORT ===== */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+    }
+    
+    header,
+    footer {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
     }
 }
