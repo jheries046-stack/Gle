@@ -265,6 +265,14 @@ function initOrderForm() {
         pickupDate.min = minDate.toISOString().split('T')[0];
     }
     
+    // Add flavor selection listeners
+    const flavorOptions = document.querySelectorAll('input[name="flavor"]');
+    flavorOptions.forEach(option => {
+        option.addEventListener('change', () => {
+            updateOrderSummary();
+        });
+    });
+    
     // Add real-time validation listeners
     const fullNameInput = document.getElementById('fullName');
     const phoneInput = document.getElementById('phoneNumber');
@@ -301,12 +309,15 @@ function initOrderForm() {
             const facebook = document.getElementById('facebook').value;
             const pickupDate = document.getElementById('pickupDate').value;
             const quantity = parseInt(document.getElementById('quantityValue').value) || 1;
+            const flavors = Array.from(document.querySelectorAll('input[name="flavor"]:checked'))
+                .map(checkbox => checkbox.value);
             const total = PRODUCT_PRICE * quantity;
 
             const order = {
                 fullName,
                 phoneNumber,
                 facebook,
+                flavor: flavors,
                 pickupDate,
                 quantity,
                 total,
@@ -355,12 +366,31 @@ function updateOrderSummary() {
     const unitPrice = PRODUCT_PRICE;
     const total = unitPrice * quantity;
     
+    // Get all checked flavor checkboxes
+    const flavorElements = document.querySelectorAll('input[name="flavor"]:checked');
+    
+    // Map flavor values to display names
+    const flavorMap = {
+        'plain': 'Plain Classic',
+        'ube': 'Ube Jam',
+        'crashed_graham': 'Extra Crashed Graham'
+    };
+    
+    // Get flavor display names
+    let flavorNames = Array.from(flavorElements)
+        .map(el => flavorMap[el.value] || 'Unknown')
+        .join(', ');
+    
+    if (!flavorNames) flavorNames = 'No flavor selected';
+    
     // Update summary display
     const qtyDisplay = document.getElementById('summaryQty');
     const totalDisplay = document.getElementById('summaryTotal');
+    const flavorDisplay = document.getElementById('summaryFlavor');
     
     if (qtyDisplay) qtyDisplay.textContent = quantity;
     if (totalDisplay) totalDisplay.textContent = `₱${total.toFixed(2)}`;
+    if (flavorDisplay) flavorDisplay.textContent = flavorNames;
 }
 // Real-time field validation helper
 function validateFieldRealTime(element) {
@@ -408,6 +438,7 @@ function validateForm() {
     const facebook = document.getElementById('facebook');
     const pickupDate = document.getElementById('pickupDate');
     const quantityValue = document.getElementById('quantityValue');
+    const flavorCheckboxes = document.querySelectorAll('input[name="flavor"]:checked');
 
     let isValid = true;
 
@@ -416,6 +447,20 @@ function validateForm() {
     if (!validateFieldRealTime(facebook)) isValid = false;
     if (!validateFieldRealTime(pickupDate)) isValid = false;
     if (!validateFieldRealTime(quantityValue)) isValid = false;
+    
+    // Validate that at least one flavor is selected
+    if (flavorCheckboxes.length === 0) {
+        const flavorGroup = document.querySelector('.form-group:has(input[name="flavor"])');
+        if (flavorGroup) {
+            const errorMsg = flavorGroup.querySelector('.error-msg');
+            if (errorMsg) {
+                errorMsg.textContent = 'Please select at least one flavor';
+                errorMsg.classList.add('show');
+            }
+            flavorGroup.classList.add('invalid');
+        }
+        isValid = false;
+    }
 
     return isValid;
 }

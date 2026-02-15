@@ -152,6 +152,37 @@
                     </div>
                     
                     <div class="form-group">
+                        <label>Flavor & Toppings * (Select one or more)</label>
+                        <div class="flavor-options">
+                            <label class="flavor-option">
+                                <input type="checkbox" name="flavor" value="plain">
+                                <span class="flavor-label">
+                                    <i class="fas fa-star"></i>
+                                    <strong>Plain Classic</strong>
+                                    <small>Plain with crushed graham base</small>
+                                </span>
+                            </label>
+                            <label class="flavor-option">
+                                <input type="checkbox" name="flavor" value="ube">
+                                <span class="flavor-label">
+                                    <i class="fas fa-leaf"></i>
+                                    <strong>Ube Jam</strong>
+                                    <small>Rich purple yam flavor</small>
+                                </span>
+                            </label>
+                            <label class="flavor-option">
+                                <input type="checkbox" name="flavor" value="crashed_graham">
+                                <span class="flavor-label">
+                                    <i class="fas fa-bars"></i>
+                                    <strong>Extra Crashed Graham</strong>
+                                    <small>More graham on top & base</small>
+                                </span>
+                            </label>
+                        </div>
+                        <span class="error-msg"></span>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="quantity">Quantity *</label>
                             <div class="quantity-selector">
                             <button type="button" id="qtyMinus" class="qty-btn">−</button>
@@ -164,6 +195,10 @@
                     
                     <div class="order-summary">
                         <h4>Order Summary</h4>
+                        <div class="summary-row">
+                            <span>Flavor:</span>
+                            <span id="summaryFlavor">Plain Classic</span>
+                        </div>
                         <div class="summary-row">
                             <span>Unit Price:</span>
                             <span id="summaryUnitPrice">₱25.00</span>

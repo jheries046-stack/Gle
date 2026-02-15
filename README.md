@@ -6,11 +6,13 @@ A modern, responsive web application for ordering premium jelly cheesecake with 
 
 - 🎨 Responsive design for desktop and mobile
 - 📱 Order form with real-time validation
+- 🍰 **Product Variants**: Choose from Plain Classic, Ube Jam, or Extra Crashed Graham
 - ⭐ Customer reviews and ratings system
 - 📝 Order management via REST API
 - 💾 Persistent data storage (JSON files)
 - 🔄 CORS enabled for cross-origin requests
 - ♿ Accessibility features (ARIA labels, semantic HTML)
+- 🔐 Admin login & dashboard with order tracking
 
 ## Project Structure
 
@@ -134,6 +136,44 @@ ADMIN_PASSWORD = 'your_admin_password'
 - ✅ Regularly review login logs
 - ✅ Never share admin credentials
 - ✅ Use environment variables for credentials
+
+## Product Variants 🍰
+
+Customers can now choose from three delicious flavor options:
+
+### Available Flavors
+
+1. **Plain Classic** (Default)
+   - Traditional jelly cheesecake
+   - With crushed graham base
+   - ₱25.00
+
+2. **Ube Jam** 
+   - Rich purple yam flavor
+   - Creamy and aromatic
+   - ₱25.00
+
+3. **Extra Crashed Graham**
+   - More graham on top & base
+   - Crunchy texture
+   - ₱25.00
+
+### How It Works
+- Customer selects flavor in the order form (radio buttons with visual indicators)
+- Flavor is displayed in the order summary
+- Flavor information is saved with each order
+- Admin dashboard shows which flavor was ordered
+- All flavors are at the same price point
+
+### Customization
+To add more flavors, edit the flavor options in:
+
+**Frontend**:
+- `index.html` - Update the flavor radio button options
+- `scripts/script.js` - Update the flavor name mapping in `updateOrderSummary()`
+
+**Backend**:
+- `server/server.py` - Update the `valid_flavors` list in `validate_order_input()`
 
 ### API Documentation
 

@@ -99,10 +99,30 @@ def validate_order_input(order):
     if len(digits_only) < 10:
         return False, "Invalid phone number"
     
+    # Validate flavors (now supporting multiple selections)
+    valid_flavors = ['plain', 'ube', 'crashed_graham']
+    flavors = order.get('flavor', [])
+    
+    # Handle both array format and backward compatibility with single string
+    if isinstance(flavors, str):
+        flavors = [flavors]
+    elif not isinstance(flavors, list):
+        return False, "Flavor must be a string or array"
+    
+    # Ensure at least one flavor is selected
+    if not flavors:
+        return False, "At least one flavor must be selected"
+    
+    # Validate each flavor
+    for flavor in flavors:
+        if flavor not in valid_flavors:
+            return False, f"Invalid flavor: {flavor}. Choose from: {', '.join(valid_flavors)}"
+    
     # Truncate strings to prevent abuse
     order['fullName'] = str(order.get('fullName', ''))[:100].strip()
     order['phoneNumber'] = str(order.get('phoneNumber', ''))[:20].strip()
     order['facebook'] = str(order.get('facebook', ''))[:100].strip()
+    order['flavor'] = list(set(flavors))  # Remove duplicates and ensure it's a list
     
     return True, None
 
@@ -606,13 +626,30 @@ def dashboard():
                     return;
                 }
                 
-                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Facebook</th><th>Date</th><th>Qty</th><th>Total</th><th>Created</th></tr></thead><tbody>';
+                const flavorMap = {
+                    'plain': 'Plain Classic',
+                    'ube': 'Ube Jam',
+                    'crashed_graham': 'Extra Crashed Graham'
+                };
+                
+                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Facebook</th><th>Flavor</th><th>Date</th><th>Qty</th><th>Total</th><th>Created</th></tr></thead><tbody>';
                 orders.forEach(order => {
+                    // Handle both old single flavor string and new array format
+                    let flavorNames;
+                    if (Array.isArray(order.flavor)) {
+                        flavorNames = order.flavor.map(f => flavorMap[f] || 'Unknown').join(', ');
+                    } else if (typeof order.flavor === 'string') {
+                        flavorNames = flavorMap[order.flavor] || 'Unknown';
+                    } else {
+                        flavorNames = 'Unknown';
+                    }
+                    
                     html += `<tr>
                         <td>#${order.id}</td>
                         <td>${order.fullName}</td>
                         <td>${order.phoneNumber}</td>
                         <td>${order.facebook}</td>
+                        <td>${flavorNames}</td>
                         <td>${order.pickupDate}</td>
                         <td>${order.quantity}</td>
                         <td>₱${order.total}</td>

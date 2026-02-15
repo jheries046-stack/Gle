@@ -845,6 +845,76 @@ nav ul li a:hover::after {
     display: block;
 }
 
+/* ===== FLAVOR OPTIONS ===== */
+.flavor-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.flavor-option {
+    display: block;
+    cursor: pointer;
+}
+
+.flavor-option input[type="radio"] {
+    display: none;
+}
+
+.flavor-label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fafafa;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.flavor-label i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.flavor-label strong {
+    color: var(--dark);
+    font-size: 0.98rem;
+    font-weight: 600;
+}
+
+.flavor-label small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.flavor-option input[type="radio"]:checked + .flavor-label,
+.flavor-option input[type="checkbox"]:checked + .flavor-label {
+    background: linear-gradient(135deg, var(--accent) 0%, rgba(244, 212, 200, 0.4) 100%);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(232, 112, 79, 0.2), inset 0 0 0 1px rgba(232, 112, 79, 0.3);
+    transform: translateY(-2px);
+}
+
+.flavor-option input[type="radio"]:checked + .flavor-label::after,
+.flavor-option input[type="checkbox"]:checked + .flavor-label::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.flavor-option:hover .flavor-label {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(232, 112, 79, 0.1);
+}
+
 /* ===== QUANTITY SELECTOR ===== */
 .quantity-selector {
     display: flex;
