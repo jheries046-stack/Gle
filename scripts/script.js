@@ -39,6 +39,20 @@ async function secureFetch(url, options = {}) {
     }
 }
 
+// Toast Notification Utility
+function showToast(message, type = 'info', duration = 3000) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+        toast.style.animation = 'slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
 function loadReviewsFromStorage() {
     const stored = localStorage.getItem(REVIEWS_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -298,6 +312,23 @@ function initOrderForm() {
         submitBtn.classList.add('enabled');
     }
     
+    // Add terms checkbox listener
+    const agreeTerms = document.getElementById('agreeTerms');
+    if (agreeTerms) {
+        agreeTerms.addEventListener('change', () => {
+            const termsGroup = document.querySelector('.terms-group');
+            if (agreeTerms.checked) {
+                if (termsGroup) {
+                    termsGroup.classList.remove('invalid');
+                    const errorMsg = termsGroup.querySelector('.error-msg');
+                    if (errorMsg) {
+                        errorMsg.classList.remove('show');
+                    }
+                }
+            }
+        });
+    }
+    
     // Form submission
     orderForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -336,12 +367,15 @@ function initOrderForm() {
                 }
             } catch (e) {
                 console.error('Error saving order:', e.message);
-                alert('Error saving your order. Please try again.');
+                showToast('Error saving your order. Please try again.', 'error');
                 return;
             }
 
             // Show success modal
             showSuccessModal();
+            
+            // Show success toast
+            showToast('Order placed successfully! We\'ll contact you within 24 hours.', 'success', 4000);
 
             // Reset form
             orderForm.reset();
@@ -439,6 +473,7 @@ function validateForm() {
     const pickupDate = document.getElementById('pickupDate');
     const quantityValue = document.getElementById('quantityValue');
     const flavorCheckboxes = document.querySelectorAll('input[name="flavor"]:checked');
+    const agreeTerms = document.getElementById('agreeTerms');
 
     let isValid = true;
 
@@ -460,6 +495,30 @@ function validateForm() {
             flavorGroup.classList.add('invalid');
         }
         isValid = false;
+    }
+    
+    // Validate terms acceptance
+    if (!agreeTerms || !agreeTerms.checked) {
+        const termsGroup = document.querySelector('.terms-group');
+        if (termsGroup) {
+            const errorMsg = termsGroup.querySelector('.error-msg');
+            if (errorMsg) {
+                errorMsg.textContent = 'You must agree to the terms and policies';
+                errorMsg.classList.add('show');
+            }
+            termsGroup.classList.add('invalid');
+        }
+        showToast('Please agree to the terms and policies', 'error');
+        isValid = false;
+    } else {
+        const termsGroup = document.querySelector('.terms-group');
+        if (termsGroup) {
+            const errorMsg = termsGroup.querySelector('.error-msg');
+            if (errorMsg) {
+                errorMsg.classList.remove('show');
+            }
+            termsGroup.classList.remove('invalid');
+        }
     }
 
     return isValid;
